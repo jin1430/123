@@ -1,1 +1,1 @@
-"# first-repository" 
+Welcome to KDT project GoCafe
