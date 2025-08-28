@@ -28,11 +28,9 @@ public class Menu {
     @Column(name = "menu_price", nullable = false)
     private int menuPrice;
 
-    // 'Y' 또는 'N'
     @Column(name = "menu_new", length = 1)
     private String menuNew;
 
-    // 'Y' 또는 'N'  (DB 컬럼명 철자에 맞춰 매핑)
     @Column(name = "menu_recommanded", length = 1)
     private String menuRecommanded;
 }

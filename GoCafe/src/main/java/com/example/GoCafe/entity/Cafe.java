@@ -43,4 +43,7 @@ public class Cafe {
 
     @Column(name = "cafe_photo", length = 30)
     private String cafePhoto;
+
+    @Column(name = "cafe_code", nullable = false, length = 10)
+    private String cafeCode;
 }
