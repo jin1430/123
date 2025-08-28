@@ -1,4 +1,3 @@
-// src/main/java/com/example/GoCafe/dto/UserForm.java
 package com.example.GoCafe.dto;
 
 import com.example.GoCafe.entity.User;

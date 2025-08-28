@@ -5,12 +5,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
 public class Review {
 
     @Id
@@ -30,9 +32,9 @@ public class Review {
     @Column(name = "review_date", nullable = false)
     private java.time.LocalDateTime reviewDate;
 
-    @Column(name = "review_good", nullable = false)
+    @Column(name = "review_good")
     private Long reviewGood;
 
-    @Column(name = "review_bad", nullable = false)
+    @Column(name = "review_bad")
     private Long reviewBad;
 }

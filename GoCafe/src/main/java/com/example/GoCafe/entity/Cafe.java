@@ -5,12 +5,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
 public class Cafe {
 
     @Id
@@ -25,10 +27,10 @@ public class Cafe {
     private String cafeAddress;
 
     @Column(name = "cafe_lat", nullable = false)
-    private Long cafeLat;
+    private Double cafeLat;
 
     @Column(name = "cafe_lon", nullable = false)
-    private Long cafeLon;
+    private Double cafeLon;
 
     @Column(name = "cafe_number", nullable = false, unique = true, length = 12)
     private String cafeNumber;
