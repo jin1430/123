@@ -21,4 +21,19 @@ public class Menu {
 
     @Column(name = "cafe_id", nullable = false)
     private Long cafeId;
+
+    @Column(name = "category_id", nullable = false)
+    private Long categoryId;
+
+    @Column(name = "menu_name", nullable = false, length =12)
+    private String menuName;
+
+    @Column(name = "menu_price", nullable = false)
+    private Long menuPrice;
+
+    @Column(name = "menu_new", length = 1)
+    private String menuNew;
+
+    @Column(name = "menu_recommanded", length = 1)
+    private String menuRecommanded;
 }
