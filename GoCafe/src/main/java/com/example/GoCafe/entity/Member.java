@@ -46,4 +46,9 @@ public class Member {
     @Column(name = "member_photo", length = 30)
     private String memberPhoto;
 
+    @Column(name = "token_version", nullable = false)
+    private Long tokenVersion = 0L;
+
+    public Long getTokenVersion() { return tokenVersion; }
+    public void setTokenVersion(Long tokenVersion) { this.tokenVersion = tokenVersion; }
 }

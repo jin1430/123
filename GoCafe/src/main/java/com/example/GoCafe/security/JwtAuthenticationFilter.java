@@ -1,5 +1,6 @@
 package com.example.GoCafe.security;
 
+import com.example.GoCafe.repository.MemberRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,42 +22,48 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
     private final JwtTokenProvider tokenProvider;
     private final UserDetailsService userDetailsService;
+    private final MemberRepository memberRepository;
 
-    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider, UserDetailsService userDetailsService) {
+    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider,
+                                   UserDetailsService userDetailsService,
+                                   MemberRepository memberRepository) {
         this.tokenProvider = tokenProvider;
         this.userDetailsService = userDetailsService;
-    }
-
-    private String resolveToken(HttpServletRequest request) {
-        String auth = request.getHeader("Authorization"); // 헤더 이름은 대소문자 무시
-        if (StringUtils.hasText(auth)) {
-            String lower = auth.toLowerCase();
-            if (lower.startsWith("bearer ")) return auth.substring(7).trim();
-        }
-        // (옵션) 쿼리/쿠키로 전달하는 경우 임시 지원 — 필요 없으면 제거
-        String t = request.getParameter("token");
-        if (StringUtils.hasText(t)) return t.trim();
-        return null;
+        this.memberRepository = memberRepository;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
             throws ServletException, IOException {
         try {
-            String token = resolveToken(req);
-            if (StringUtils.hasText(token)) {
-                String username = tokenProvider.extractUsername(token); // 여기서 검증 & 만료 체크
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                    if (log.isDebugEnabled()) log.debug("JWT 인증 성공: {}", username);
+            String auth = req.getHeader("Authorization");
+            if (StringUtils.hasText(auth) && auth.toLowerCase().startsWith("bearer ")) {
+                String token = auth.substring(7).trim();
+                String email = tokenProvider.extractUsername(token);
+                Number verClaim = tokenProvider.extractClaim(token, c -> c.get("ver", Number.class)); // null 가능
+
+                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    var opt = memberRepository.findByMemberEmail(email);
+                    if (opt.isPresent()) {
+                        long currentVer = opt.get().getTokenVersion() == null ? 0L : opt.get().getTokenVersion();
+                        long tokenVer   = verClaim == null ? 0L : verClaim.longValue();
+
+                        if (currentVer != tokenVer) {
+                            log.debug("JWT 버전 불일치: tokenVer={}, currentVer={} -> 인증 거부", tokenVer, currentVer);
+                            chain.doFilter(req, res);
+                            return; // 인증 미설정 → 401 흐름
+                        }
+
+                        UserDetails ud = userDetailsService.loadUserByUsername(email);
+                        UsernamePasswordAuthenticationToken authToken =
+                                new UsernamePasswordAuthenticationToken(ud, null, ud.getAuthorities());
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                        log.debug("JWT 인증 성공: {}", email);
+                    }
                 }
             }
         } catch (Exception e) {
-            // 여기서 에러가 나면 인증이 설정되지 않아 401이 떨어집니다. 로그로 이유 확인 가능.
             log.debug("JWT 처리 실패: {}", e.getMessage());
         }
         chain.doFilter(req, res);
