@@ -3,8 +3,10 @@ package com.example.GoCafe.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@NoArgsConstructor
 @Entity
 @Table(name = "cafe_info") // 테이블명 스네이크케이스로 지정
 @Getter

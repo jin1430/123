@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,7 +30,7 @@ public class CafeForm {
                 cafeLat,
                 cafeLon,
                 cafeNumber,
-                java.time.LocalDateTime.now(), // cafeDate (현재시각)
+                LocalDateTime.now(), // cafeDate (현재시각)
                 cafeViews,                    // cafeViews 기본 0
                 cafePhoto,
                 cafeCode

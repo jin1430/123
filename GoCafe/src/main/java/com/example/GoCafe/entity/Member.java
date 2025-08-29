@@ -7,8 +7,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@NoArgsConstructor
 @Entity
 @Getter
 @Setter
@@ -20,10 +22,10 @@ public class Member {
     @Column(name = "member_id", nullable = false, unique = true)
     private Long memberId;
 
-    @Column(name = "member_email", nullable = false, unique = true, length = 20)
+    @Column(name = "member_email", nullable = false, unique = true, length = 100)
     private String memberEmail;
 
-    @Column(name = "member_password", nullable = false, length = 20)
+    @Column(name = "member_password", nullable = false, length = 100)
     private String memberPassword;
 
     @Column(name = "member_nickname", nullable = false, unique = true, length = 8)
@@ -35,7 +37,7 @@ public class Member {
     @Column(name = "member_gender", length = 1)
     private String memberGender;
 
-    @Column(name = "member_role", nullable = false, length = 5)
+    @Column(name = "member_role", nullable = false, length = 20)
     private String memberRole;
 
     @Column(name = "member_date", nullable = false)
@@ -43,4 +45,5 @@ public class Member {
 
     @Column(name = "member_photo", length = 30)
     private String memberPhoto;
+
 }
