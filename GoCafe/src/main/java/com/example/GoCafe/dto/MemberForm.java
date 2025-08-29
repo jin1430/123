@@ -20,6 +20,7 @@ public class MemberForm {
     private String memberRole;
     private java.time.LocalDateTime memberDate;
     private String memberPhoto;
+    private Long tokenVersion;
 
     public Member toEntity() {
         return new Member(
@@ -31,7 +32,8 @@ public class MemberForm {
                 memberGender,
                 memberRole,
                 memberDate,
-                memberPhoto
+                memberPhoto,
+                tokenVersion
         );
     }
 }
