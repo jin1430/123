@@ -18,6 +18,7 @@ public class CafeForm {
     private String cafeNumber;
     private Long cafeViews;
     private String cafePhoto; // 선택
+    private String cafeCode;
 
     public Cafe toEntity() {
         return new Cafe(
@@ -29,7 +30,8 @@ public class CafeForm {
                 cafeNumber,
                 java.time.LocalDateTime.now(), // cafeDate (현재시각)
                 cafeViews,                    // cafeViews 기본 0
-                cafePhoto
+                cafePhoto,
+                cafeCode
         );
     }
 }

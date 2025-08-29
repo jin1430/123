@@ -1,4 +1,4 @@
 package com.example.GoCafe.controller;
 
-public class UserController {
+public class MemberController {
 }
