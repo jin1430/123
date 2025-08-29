@@ -31,7 +31,7 @@ public class Member {
     @Column(name = "member_nickname", nullable = false, unique = true, length = 8)
     private String memberNickname;
 
-    @Column(name = "user_age")
+    @Column(name = "member_age")
     private Long memberAge;
 
     @Column(name = "member_gender", length = 1)
