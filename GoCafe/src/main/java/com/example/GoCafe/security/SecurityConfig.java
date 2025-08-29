@@ -65,11 +65,16 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/error").permitAll()
 
+                        // ✅ 비로그인 접근 허용
+                        .requestMatchers("/", "/index/**", "/search/**", "/signup", "/cafes/**","/login","/api/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/img/**", "/favicon.ico").permitAll()
+
                         .requestMatchers("/api/auth/login", "/api/auth/signup").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
 
                         .requestMatchers("/api/private/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/**").permitAll()
 
                         .anyRequest().authenticated()
                 )

@@ -1,0 +1,137 @@
+package com.example.GoCafe.controller;
+
+import com.example.GoCafe.entity.Member;
+import com.example.GoCafe.repository.MemberRepository;
+import com.example.GoCafe.security.JwtTokenProvider;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import jakarta.servlet.http.HttpServletResponse;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+@Controller
+public class AuthViewController {
+
+    private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
+
+    public AuthViewController(MemberRepository memberRepository,
+                              PasswordEncoder passwordEncoder,
+                              JwtTokenProvider jwtTokenProvider) {
+        this.memberRepository = memberRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
+
+    @GetMapping("/login")
+    public String loginPage() { return "auth/login"; }
+
+    @PostMapping("/login")
+    public String loginSubmit(@RequestParam String memberEmail,
+                              @RequestParam String memberPassword,
+                              HttpServletResponse response,
+                              RedirectAttributes ra,
+                              Model model) {
+        Optional<Member> opt = memberRepository.findByMemberEmail(memberEmail);
+        if (opt.isEmpty()) {
+            ra.addFlashAttribute("error", "이메일 또는 비밀번호가 올바르지 않습니다.");
+            return "redirect:/login";
+        }
+        Member member = opt.get();
+        boolean matches = false;
+        if (member.getMemberPassword() != null) {
+            try { matches = passwordEncoder.matches(memberPassword, member.getMemberPassword()); } catch (Exception ignored) {}
+            if (!matches) matches = memberPassword.equals(member.getMemberPassword()); // dev only
+        }
+        if (!matches) {
+            ra.addFlashAttribute("error", "이메일 또는 비밀번호가 올바르지 않습니다.");
+            return "redirect:/login";
+        }
+
+        var ud = org.springframework.security.core.userdetails.User
+                .withUsername(member.getMemberEmail())
+                .password(member.getMemberPassword())
+                .authorities(
+                        (member.getMemberRole()!=null && member.getMemberRole().startsWith("ROLE_"))
+                                ? member.getMemberRole()
+                                : "ROLE_" + (member.getMemberRole()==null ? "USER" : member.getMemberRole())
+                )
+                .build();
+
+        String token = jwtTokenProvider.generateToken(ud, member.getTokenVersion()==null?0L:member.getTokenVersion());
+        ResponseCookie cookie = ResponseCookie.from("AT", token)
+                .httpOnly(true).secure(false).sameSite("Lax")
+                .path("/").maxAge(Duration.ofDays(7))
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return "redirect:/";
+    }
+
+    @GetMapping("/signup")
+    public String signupPage() { return "auth/signup"; }
+
+    @PostMapping("/signup")
+    public String signupSubmit(@RequestParam String memberEmail,
+                               @RequestParam String memberPassword,
+                               @RequestParam String memberPasswordConfirm,
+                               @RequestParam String memberNickname,
+                               @RequestParam(required = false) Long memberAge,
+                               @RequestParam(required = false) String memberGender,
+                               Model model) {
+
+        if (!memberPassword.equals(memberPasswordConfirm)) {
+            model.addAttribute("error", "비밀번호가 일치하지 않습니다.");
+            return "signup";
+        }
+
+        // 이메일 중복 확인
+        if (memberRepository.findByMemberEmail(memberEmail).isPresent()) {
+            model.addAttribute("error", "이미 사용 중인 이메일입니다.");
+            return "signup";
+        }
+
+        // 닉네임 중복 확인 → 실패 처리
+        if (memberRepository.findByMemberNickname(memberNickname).isPresent()) {
+            model.addAttribute("error", "이미 사용 중인 닉네임입니다.");
+            return "signup";
+        }
+
+        Member m = new Member();
+        m.setMemberEmail(memberEmail);
+        m.setMemberPassword(passwordEncoder.encode(memberPassword));
+        m.setMemberNickname(memberNickname);
+        m.setMemberAge(memberAge);
+        m.setMemberGender("M".equalsIgnoreCase(memberGender) ? "M" :
+                "F".equalsIgnoreCase(memberGender) ? "F" : null);
+        m.setMemberRole("USER");
+        m.setMemberDate(LocalDateTime.now());
+        m.setTokenVersion(0L);
+
+        memberRepository.save(m);
+        return "redirect:/login"; // 성공 시 로그인 페이지로 이동
+    }
+
+    private String ensureUniqueNickname(String base) {
+        String candidate = base;
+        int counter = 1;
+        while (memberRepository.findByMemberNickname(candidate).isPresent()) {
+            if (candidate.length() > 6) {
+                // 최대 8자 제약 있으므로 앞쪽 잘라줌
+                candidate = base.substring(0, 6) + counter;
+            } else {
+                candidate = base + counter;
+            }
+            counter++;
+        }
+        return candidate;
+    }
+}
