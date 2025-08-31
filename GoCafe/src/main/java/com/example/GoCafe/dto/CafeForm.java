@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CafeForm {
 
+    private Long cafeOwnerId;
     private String cafeName;
     private String cafeAddress;
     private Double cafeLat;
@@ -25,6 +26,7 @@ public class CafeForm {
     public Cafe toEntity() {
         return new Cafe(
                 null,                   // cafeId (DB auto)
+                cafeOwnerId,
                 cafeName,
                 cafeAddress,
                 cafeLat,

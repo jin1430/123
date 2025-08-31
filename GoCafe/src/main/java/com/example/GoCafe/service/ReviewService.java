@@ -14,39 +14,43 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReviewService {
 
-    private final ReviewRepository repository;
+    private final ReviewRepository reviewRepository;
 
     @Transactional(readOnly = true)
     public List<Review> findAll() {
-        return repository.findAll();
+        return reviewRepository.findAll();
     }
 
     @Transactional(readOnly = true)
     public Review findById(Long id) {
-        return repository.findById(id)
+        return reviewRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Review not found: " + id));
     }
 
     @Transactional
     public Review create(Review entity) {
         EntityIdUtil.setId(entity, null);
-        return repository.save(entity);
+        return reviewRepository.save(entity);
     }
 
     @Transactional
     public Review update(Long id, Review entity) {
-        if (!repository.existsById(id)) {
+        if (!reviewRepository.existsById(id)) {
             throw new NotFoundException("Review not found: " + id);
         }
         EntityIdUtil.setId(entity, id);
-        return repository.save(entity);
+        return reviewRepository.save(entity);
     }
 
     @Transactional
     public void delete(Long id) {
-        if (!repository.existsById(id)) {
+        if (!reviewRepository.existsById(id)) {
             throw new NotFoundException("Review not found: " + id);
         }
-        repository.deleteById(id);
+        reviewRepository.deleteById(id);
+    }
+
+    public Review save(Review review) {
+        return reviewRepository.save(review);
     }
 }

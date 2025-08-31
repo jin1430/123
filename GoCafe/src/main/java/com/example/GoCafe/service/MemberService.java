@@ -14,39 +14,45 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MemberService {
 
-    private final MemberRepository repository;
+    private final MemberRepository memberRepository;
 
     @Transactional(readOnly = true)
     public List<Member> findAll() {
-        return repository.findAll();
+        return memberRepository.findAll();
     }
 
     @Transactional(readOnly = true)
     public Member findById(Long id) {
-        return repository.findById(id)
+        return memberRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found: " + id));
     }
 
     @Transactional
     public Member create(Member entity) {
         EntityIdUtil.setId(entity, null);
-        return repository.save(entity);
+        return memberRepository.save(entity);
     }
 
     @Transactional
     public Member update(Long id, Member entity) {
-        if (!repository.existsById(id)) {
+        if (!memberRepository.existsById(id)) {
             throw new NotFoundException("User not found: " + id);
         }
         EntityIdUtil.setId(entity, id);
-        return repository.save(entity);
+        return memberRepository.save(entity);
     }
 
     @Transactional
     public void delete(Long id) {
-        if (!repository.existsById(id)) {
+        if (!memberRepository.existsById(id)) {
             throw new NotFoundException("User not found: " + id);
         }
-        repository.deleteById(id);
+        memberRepository.deleteById(id);
+    }
+
+    public Member findByMemberEmail(String memberEmail) {
+        return memberRepository.findByMemberEmail(memberEmail)
+                .orElseThrow(() -> new NotFoundException("member not found: " + memberEmail));
     }
 }
+

@@ -23,6 +23,9 @@ public class Cafe {
     @Column(name = "cafe_id", nullable = false, unique = true)
     private Long cafeId;
 
+    @Column(name = "cafe_owner_id")
+    private Long cafeOwnerId;
+
     @Column(name = "cafe_name", nullable = false, unique = true, length = 10)
     private String cafeName;
 
