@@ -1,0 +1,14 @@
+{{>layout/header}}
+
+<main class="cg-container" style="padding:24px 0">
+    <h1 class="cg-title">회원 탈퇴</h1>
+    <p>계정 <b>{{email}}</b> 을(를) 정말로 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</p>
+
+    <form method="post" action="/member/withdraw" style="margin-top:16px;">
+        {{#_csrf}}<input type="hidden" name="{{parameterName}}" value="{{token}}">{{/_csrf}}
+        <button type="submit" class="cg-btn" style="background:#dc2626;color:#fff;">탈퇴하기</button>
+        <a href="/member/me" class="cg-btn" style="margin-left:8px;">취소</a>
+    </form>
+</main>
+
+{{>layout/footer}}

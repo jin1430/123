@@ -1,3 +1,4 @@
+// src/main/java/com/example/GoCafe/service/MemberService.java
 package com.example.GoCafe.service;
 
 import com.example.GoCafe.entity.Member;
@@ -5,9 +6,11 @@ import com.example.GoCafe.repository.MemberRepository;
 import com.example.GoCafe.support.EntityIdUtil;
 import com.example.GoCafe.support.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime; // 필요 시
 import java.util.List;
 
 @Service
@@ -15,6 +18,7 @@ import java.util.List;
 public class MemberService {
 
     private final MemberRepository repository;
+    private final PasswordEncoder passwordEncoder; // BCrypt 빈 등록 가정
 
     @Transactional(readOnly = true)
     public List<Member> findAll() {
@@ -48,5 +52,69 @@ public class MemberService {
             throw new NotFoundException("User not found: " + id);
         }
         repository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public Member findByEmail(String email) {
+        return repository.findByMemberEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found by email: " + email));
+    }
+
+    // ===== 여기에 추가: 프로필 수정(+선택적 비번변경), 탈퇴, 토큰버전 =====
+
+    /**
+     * 프로필 수정 + (옵션) 비밀번호 변경을 한 번에 처리.
+     * @return changedPassword: 비밀번호가 실제로 변경되었으면 true
+     */
+    @Transactional
+    public boolean updateSelf(Long memberId,
+                              String nickname,
+                              Long age,
+                              String gender,
+                              String photo,
+                              String currentPasswordNullable,
+                              String newPasswordNullable) {
+
+        Member m = findById(memberId);
+
+        // 닉네임 변경 중복 체크
+        if (nickname != null && !nickname.isBlank()
+                && !nickname.equals(m.getMemberNickname())
+                && repository.existsByMemberNickname(nickname)) {
+            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+        }
+
+        // 일반 프로필 변경
+        if (nickname != null && !nickname.isBlank()) m.setMemberNickname(nickname);
+        if (age != null) m.setMemberAge(age);
+        if (gender != null && !gender.isBlank()) m.setMemberGender(gender);
+        if (photo != null) m.setMemberPhoto(photo);
+
+        // 비번 변경 (둘 다 들어온 경우에만 시도)
+        boolean changePw = (currentPasswordNullable != null && !currentPasswordNullable.isBlank()
+                && newPasswordNullable != null && !newPasswordNullable.isBlank());
+
+        if (changePw) {
+            if (!passwordEncoder.matches(currentPasswordNullable, m.getMemberPassword())) {
+                throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+            }
+            m.setMemberPassword(passwordEncoder.encode(newPasswordNullable));
+            bumpTokenVersionInternal(m); // 세션/토큰 무효화 의도
+            return true;
+        }
+
+        return false;
+    }
+
+    /** 자기 자신 탈퇴 */
+    @Transactional
+    public void withdrawSelf(Long memberId) {
+        delete(memberId);
+    }
+
+    /** 토큰버전 증가 (내부용) */
+    private void bumpTokenVersionInternal(Member m) {
+        Long v = (m.getTokenVersion() == null ? 0L : m.getTokenVersion());
+        m.setTokenVersion(v + 1);
     }
 }

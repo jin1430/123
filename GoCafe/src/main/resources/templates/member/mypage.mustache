@@ -1,0 +1,41 @@
+{{>layout/header}}
+
+<main class="cg-container mypage" style="padding:24px 0">
+    <h1 class="cg-title">마이페이지</h1>
+
+    <!-- 좌우 분할 컨테이너: aside + section 형제 -->
+    <div id="me-layout" style="display:grid;grid-template-columns:220px 1fr;column-gap:24px;align-items:start;">
+        <!-- 왼쪽 네비 -->
+        <aside>
+            <nav>
+                <a href="/member/edit"      style="display:block;padding:12px 14px;margin-bottom:8px;border:1px solid #e5e7eb;border-radius:12px;text-decoration:none;">내 정보 수정</a>
+                <a href="/reviews/mine"     style="display:block;padding:12px 14px;margin-bottom:8px;border:1px solid #e5e7eb;border-radius:12px;text-decoration:none;">내가 쓴 리뷰</a>
+                <a href="/favorites"        style="display:block;padding:12px 14px;margin-bottom:8px;border:1px solid #e5e7eb;border-radius:12px;text-decoration:none;">즐겨찾기 목록 확인</a>
+                <a href="/member/withdraw"  style="display:block;padding:12px 14px;margin-bottom:8px;border:1px solid #fecaca;border-radius:12px;background:#fff7f7;color:#dc2626;text-decoration:none;">회원 탈퇴</a>
+            </nav>
+        </aside>
+
+        <!-- 오른쪽 메인 -->
+        <section>
+            <div class="cg-card">
+                <div class="cg-card__body" style="padding:36px 50px;box-sizing:border-box;">
+                    <div style="display:flex;justify-content:space-between;gap:24px;margin:0;">
+                        <div style="flex:1;">
+                            <p><b>닉네임</b> : {{member.memberNickname}}</p>
+                            <p><b>이메일</b> : {{member.memberEmail}}</p>
+                            <p><b>역할</b> : {{member.memberRole}}</p>
+                            <p><b>성별</b> : {{member.memberGender}}</p>
+                            <p><b>나이</b> : {{member.memberAge}}</p>
+                            <p><b>가입일</b> : {{member.memberDate}}</p>
+                        </div>
+                        {{#member.memberPhoto}}
+                            <img src="/images/profile/{{member.memberPhoto}}" alt="프로필" class="cg-avatar-lg"/>
+                        {{/member.memberPhoto}}
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+{{>layout/footer}}
