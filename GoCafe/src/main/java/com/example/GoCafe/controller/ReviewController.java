@@ -41,7 +41,7 @@ public class ReviewController {
                                @RequestParam(value = "photos", required = false) List<MultipartFile> photos) {
 
         // ✅ CafeController와 동일한 방식
-        Long userId = memberService.findByMemberEmail(memberEmail).getMemberId();
+        Long userId = memberService.findByEmail(memberEmail).getMemberId();
 
         Review review = new Review();
         review.setCafeId(cafeId);

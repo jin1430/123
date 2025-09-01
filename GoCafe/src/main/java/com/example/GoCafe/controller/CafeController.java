@@ -32,7 +32,7 @@ public class CafeController {
                              @Valid @ModelAttribute("form") CafeForm form,
                              Model model) {
 
-        Long memberId = memberService.findByMemberEmail(memberEmail).getMemberId();
+        Long memberId = memberService.findByEmail(memberEmail).getMemberId();
 
         Long cafeId = cafeService.createCafe(memberId, form); // 내부에서 권한 승격 처리
         return "redirect:/cafes/" + cafeId;

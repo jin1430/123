@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime; // 필요 시
 import java.util.List;
 
 @Service
@@ -115,10 +114,5 @@ public class MemberService {
     private void bumpTokenVersionInternal(Member m) {
         Long v = (m.getTokenVersion() == null ? 0L : m.getTokenVersion());
         m.setTokenVersion(v + 1);
-    }
-
-    public Member findByMemberEmail(String memberEmail) {
-        return memberRepository.findByMemberEmail(memberEmail)
-                .orElseThrow(() -> new NotFoundException("member not found: " + memberEmail));
     }
 }
