@@ -25,7 +25,7 @@ public class MainViewController {
     private final CafeTagService cafeTagService;
     private final ReviewService reviewService;
 
-    @GetMapping({"/", "/index"})
+    @GetMapping({"/", "/main"})
     public String home(Model model) {
         List<Cafe> trending = cafeService.findAll().stream()
                 .sorted(Comparator.comparingLong(c -> {
@@ -49,7 +49,7 @@ public class MainViewController {
         model.addAttribute("trendingCafes", trending);
         model.addAttribute("cafeTags", tags);
         model.addAttribute("recentReviews", recent);
-        return "index"; // templates/index.mustache
+        return "page/main";
     }
 
     @GetMapping("/search")
@@ -86,6 +86,6 @@ public class MainViewController {
         model.addAttribute("query", q);
         model.addAttribute("selectedTag", tag);
         model.addAttribute("selectedCategory", category);
-        return "index";
+        return "page/main";
     }
 }

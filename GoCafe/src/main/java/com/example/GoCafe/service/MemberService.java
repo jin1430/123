@@ -1,4 +1,3 @@
-// src/main/java/com/example/GoCafe/service/MemberService.java
 package com.example.GoCafe.service;
 
 import com.example.GoCafe.entity.Member;
@@ -116,5 +115,10 @@ public class MemberService {
     private void bumpTokenVersionInternal(Member m) {
         Long v = (m.getTokenVersion() == null ? 0L : m.getTokenVersion());
         m.setTokenVersion(v + 1);
+    }
+
+    public Member findByMemberEmail(String memberEmail) {
+        return memberRepository.findByMemberEmail(memberEmail)
+                .orElseThrow(() -> new NotFoundException("member not found: " + memberEmail));
     }
 }

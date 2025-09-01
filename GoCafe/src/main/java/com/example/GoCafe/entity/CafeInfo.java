@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @NoArgsConstructor
 @Entity
-@Table(name = "cafe_info") // 테이블명 스네이크케이스로 지정
+@Table(name = "cafe_info")
 @Getter
 @Setter
 @AllArgsConstructor

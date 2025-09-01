@@ -40,7 +40,6 @@
                         </div>
                         <div class="cg-card__body">
                             <div class="cg-card__title">{{cafeName}}</div>
-                            <div class="cg-card__sub">{{{cafeAddress}}}</div> <!-- ✅ 주소 이스케이프 해제 -->
                             <div class="cg-card__meta">조회수 {{cafeViews}}</div>
                         </div>
                     </a>
@@ -66,6 +65,10 @@
             {{^recentReviews}}<li class="cg-empty">아직 후기가 없네요.</li>{{/recentReviews}}
         </ul>
     </section>
+
+    {{#isLoggedIn}}
+        <a href="/cafes/new"  class="cg-btn-outline">카페 등록</a>
+    {{/isLoggedIn}}
 
 </main>
 
