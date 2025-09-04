@@ -1,0 +1,34 @@
+{{>layout/header}}
+
+<div class="container my-4">
+    <h1 class="mb-4">내게 맞는 카페 찾기 ☕</h1>
+    <p class="text-muted">몇 가지 질문에 답하고 나만의 취향에 맞는 카페를 추천받아보세요!</p>
+    <hr>
+
+    <form action="/recommend" method="post">
+        {{#questionnaire}}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">{{questionText}}</h5>
+                </div>
+                <div class="card-body">
+                    <input type="hidden" name="{{questionCode}}" value="">
+                    {{#answerOptions}}
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="{{questionCode}}" id="{{questionCode}}-{{@key}}" value="{{@key}}">
+                            <label class="form-check-label" for="{{questionCode}}-{{@key}}">
+                                {{.}}
+                            </label>
+                        </div>
+                    {{/answerOptions}}
+                </div>
+            </div>
+        {{/questionnaire}}
+
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary btn-lg">결과 보기</button>
+        </div>
+    </form>
+</div>
+
+{{>layout/footer}}

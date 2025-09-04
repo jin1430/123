@@ -1,8 +1,8 @@
 package com.example.GoCafe.service;
 
+import com.example.GoCafe.dto.CafeTagForm;
 import com.example.GoCafe.entity.CafeTag;
 import com.example.GoCafe.repository.CafeTagRepository;
-import com.example.GoCafe.support.EntityIdUtil;
 import com.example.GoCafe.support.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,39 +14,51 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CafeTagService {
 
-    private final CafeTagRepository repository;
+    private final CafeTagRepository cafeTagRepository;
+
+    // ======================================================
+    // ==== 컨트롤러 오류 해결을 위한 기본 CRUD 메소드 추가 ====
+    // ======================================================
 
     @Transactional(readOnly = true)
     public List<CafeTag> findAll() {
-        return repository.findAll();
+        return cafeTagRepository.findAll();
     }
 
     @Transactional(readOnly = true)
     public CafeTag findById(Long id) {
-        return repository.findById(id)
+        return cafeTagRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("CafeTag not found: " + id));
     }
 
+    // API에서 직접 CafeTag 엔티티를 받아 생성하는 경우
     @Transactional
     public CafeTag create(CafeTag entity) {
-        EntityIdUtil.setId(entity, null);
-        return repository.save(entity);
+        return cafeTagRepository.save(entity);
+    }
+
+    // DTO를 사용해 생성하는 경우
+    @Transactional
+    public Long createCafeTag(CafeTagForm form) {
+        CafeTag cafeTag = form.toEntity(); // 기존 방식 그대로 DTO -> Entity 변환
+        CafeTag saved = cafeTagRepository.save(cafeTag);
+        return saved.getCafeTagId();
     }
 
     @Transactional
     public CafeTag update(Long id, CafeTag entity) {
-        if (!repository.existsById(id)) {
+        if (!cafeTagRepository.existsById(id)) {
             throw new NotFoundException("CafeTag not found: " + id);
         }
-        EntityIdUtil.setId(entity, id);
-        return repository.save(entity);
+        entity.setCafeTagId(id);
+        return cafeTagRepository.save(entity);
     }
 
     @Transactional
     public void delete(Long id) {
-        if (!repository.existsById(id)) {
+        if (!cafeTagRepository.existsById(id)) {
             throw new NotFoundException("CafeTag not found: " + id);
         }
-        repository.deleteById(id);
+        cafeTagRepository.deleteById(id);
     }
 }

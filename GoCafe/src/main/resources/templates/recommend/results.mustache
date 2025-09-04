@@ -1,0 +1,38 @@
+{{>layout/header}}
+
+<div class="container my-4">
+    <div class="p-5 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold">당신을 위한 카페 추천 결과 🌟</h1>
+            <p class="col-md-8 fs-4">총 {{#cafes.size}}{{cafes.size}}{{/cafes.size}}{{^cafes.size}}0{{/cafes.size}}개의 카페를 찾았어요!</p>
+        </div>
+    </div>
+
+    {{#cafes}}
+        <div class="card mb-3">
+            <div class="row g-0">
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">{{cafeName}}</h5>
+                        <p class="card-text">{{cafeAddress}}</p>
+                        <a href="/cafes/{{cafeId}}" class="btn btn-primary">상세보기</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{/cafes}}
+
+    {{^cafes}}
+        <div class="alert alert-warning" role="alert">
+            <h4 class="alert-heading">이런!</h4>
+            <p>아쉽지만 조건에 맞는 카페를 찾지 못했어요. 😥 다른 조건으로 다시 시도해보는 건 어떨까요?</p>
+        </div>
+    {{/cafes}}
+
+    <div class="mt-4 d-grid gap-2 d-md-flex justify-content-md-end">
+        <a href="/recommend" class="btn btn-secondary">다시 찾아보기</a>
+        <a href="/" class="btn btn-outline-secondary">메인으로 돌아가기</a>
+    </div>
+</div>
+
+{{>layout/footer}}
